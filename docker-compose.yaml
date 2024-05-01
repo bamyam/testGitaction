@@ -1,0 +1,19 @@
+services:
+  web:
+    image: bamyam/secondproject
+    build: web
+    ports:
+      - 8000:8000
+    environment:
+      userid: clouds
+      passwd: clouds
+      dbname: clouds
+      dbhost: 13.125.245.89
+      GMAIL_PASS: 'zpcb gtbm baks hxlh'
+
+  nginx:
+    build: nginx
+    ports:
+      - 80:80
+    depends_on:
+      - web
