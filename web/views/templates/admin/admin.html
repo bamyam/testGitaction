@@ -1,0 +1,404 @@
+{% extends 'base.html' %}
+{% block style %}
+    <style>
+        main {
+            width: 100%;
+            height: 700px;
+        }
+        .request {
+            border: 1px solid blue;
+            margin: 70px auto;
+            width: 1300px;
+            background-color: white;
+            box-shadow: 0 15px 30px 0 black;
+            text-align: center;
+            font-size: 15px;
+        }
+
+        form {
+            margin-bottom: 100px;
+        }
+
+        td {
+            padding-top : 3px;
+            padding-bottom: 3px;
+        }
+
+        textarea { width: 100%; height: 80px}
+
+        {#버튼이 안 눌러지는 문제 해결#}
+        li > a {
+            z-index: 9;
+        }
+
+        /* 모달 */
+        #acceptModal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 30px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1;
+            border-radius: 15px;
+        }
+
+        #rejectModal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 30px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1;
+            border-radius: 15px;
+        }
+
+        /* 어두운 배경 생성 */
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 0;
+        }
+
+        #acceptModal > div > p, #rejectModal > div > p {
+            display: inline-block;
+            font-size: 20px;
+        }
+
+        {#로딩#}
+        .loader {
+            display: none;
+            border : 12px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #1a73e8;
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            animation: spin 1s linear infinite;
+            position: fixed;
+            top: 50%;
+            left: 47%;
+            z-index: 11;
+
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+    </style>
+{% endblock %}
+{% block main %}
+    <main>
+        <div class="request">
+            <h2 style="margin-top: 15px">방문자 관리 페이지</h2>
+            <form name="dataForm">
+                <table class="table-bordered container mt-4" >
+                    <tr>
+                        <th>NO</th>
+                        <th>접수시간</th>
+                        <th>회사이름</th>
+                        <th>부서명</th>
+                        <th>직급</th>
+                        <th>이름</th>
+                        <th>전화번호</th>
+                        <th>담당자(보안등급)</th>
+                        <th>방문목적</th>
+                        <th>방문장소(보안등급)</th>
+                        <th>방문날짜</th>
+                        <th>접수상태</th>
+                        <th>
+                            승인/거절
+                        </th>
+                    </tr>
+                    {% for i in info %}
+                    <tr>
+                        <td>{{ i.id }}</td>
+                        <td>{{ i.regdate }}</td>
+                        <td>{{ i.company_name }}</td>
+                        <td>{{ i.department_name }}</td>
+                        <td>{{ i.job_position }}</td>
+                        <td>{{ i.name }}</td>
+                        <td>{{ i.phone_number }}</td>
+                        <td>{{ i.department_name_1 }} {{ i.job_position_1 }} {{ i.name_1 }}({{ i.security_grade }})</td>
+                        <td>{{ i.purpose }}</td>
+                        <td>{{ i.location }}({{ i.security_grade_1 }})</td>
+                        <td>{{ i.visit_date }}</td>
+                        {% if i.status == "N" %}
+                        <td>{{ i.status }}(접수 중)</td>
+                        <td >
+                            <button onclick="openModal1(this)" type="button" class="btn btn-primary btn-sm">승인</button>
+                            <button onclick="openModal2(this)" type="button" class="btn btn-danger btn-sm">거절</button>
+                        </td>
+                        {% elif i.status == "Y" %}
+                        <td>{{ i.status }}(승인)</td>
+                        <td style="padding-top : 5px; padding-bottom: 5px;">승인완료</td>
+                        {% elif i.status == "R" %}
+                        <td>{{ i.status }}(거절)</td>
+                        <td style="padding-top : 5px; padding-bottom: 5px;">거절완료</td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </table>
+            </form>
+            <ul class="pagination justify-content-center mt-4">
+                {% if cpg == 1 %}
+                    <li class="page-item disabled">
+                        {% else %}
+                    <li class="page-item">
+                {% endif %}
+                <a class="page-link" href="{{ baseurl }}{{ cpg - 1 }}">back</a></li>
+
+                {% for idx in range(stpg, stpg + 10) %}
+
+                    {% if idx <= allpage %}
+                        {% if cpg == idx %}
+                        <li class="page-item active">
+                            {% else %}
+                        <li class="page-item">
+                        {% endif %}
+                <a class="page-link" href="{{ baseurl }}{{ idx }}">{{ idx }}</a></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if cpg == allpage %}
+                    <li class="page-item disabled">
+                        {% else %}
+                    <li class="page-item">
+                {% endif %}
+                <a class="page-link" href="{{ baseurl }}{{ cpg + 1 }}">next</a></li>
+            </ul>
+        </div>
+
+
+        <div id="acceptModal" style="z-index: 10">
+            <div style="display: none" id="number">01</div>
+            <div>
+                <p id="accept_name">OOO</p><p>의 출입을 허가하시겠습니까?</p>
+            </div>
+            <div>
+                <table class="table table-borderd">
+                    <tr>
+                        <th colspan="4">출입자</th>
+                    </tr>
+                    <tr>
+                        <th>회사</th>
+                        <th>부서</th>
+                        <th>직급</th>
+                        <th>이름</th>
+                    </tr>
+                    <tr>
+                        <td id="company">00</td>
+                        <td id="visit_depart">00</td>
+                        <td id="visit_posit">00</td>
+                        <td id="visit_name">00</td>
+                    </tr>
+                </table>
+                <table class="table table-borderd">
+                    <tr>
+                        <th colspan="4">담당자</th>
+                    </tr>
+                    <tr>
+                        <th >부서</th>
+                        <th >직급</th>
+                        <th>이름</th>
+                        <th>보안등급</th>
+                    </tr>
+                    <tr>
+                        <td id="emp_depart">00</td>
+                        <td id="emp_posit">00</td>
+                        <td id="emp_name">00</td>
+                        <td id="emp_sg">00</td>
+                    </tr>
+                    <tr>
+                        <th colspan="2">방문목적</th>
+                        <th>방문장소</th>
+                        <th>보안등급</th>
+                    </tr>
+                    <tr>
+                        <td colspan="2" id="purpose">00</td>
+                        <td id="location">00</td>
+                        <td id="loc_sg">0</td>
+                    </tr>
+                </table>
+            </div>
+            <div style="text-align: right">
+                <button onclick="closeModal1()" type="button" class="btn btn-light">이전</button>
+                <button type="button" id="accept_btn" class="btn btn-primary">승인</button>
+            </div>
+        </div>
+
+        <div id="rejectModal" style="z-index: 10">
+            <div style="display: none" id="number_r">01</div>
+            <div>
+                <p id="reject_name">OOO</p><p>의 출입을 거부하시겠습니까?</p>
+            </div>
+            <div>
+                <table class="table table-borderd">
+                    <tr>
+                        <th colspan="4">출입자</th>
+                    </tr>
+                    <tr>
+                        <th>회사</th>
+                        <th>부서</th>
+                        <th>직급</th>
+                        <th>이름</th>
+                    </tr>
+                    <tr>
+                        <td id="company_r">00</td>
+                        <td id="visit_depart_r">00</td>
+                        <td id="visit_posit_r">00</td>
+                        <td id="visit_name_r">00</td>
+                    </tr>
+                    <tr>
+                        <th colspan="2">방문목적</th>
+                        <th>방문장소</th>
+                        <th>보안등급</th>
+                    </tr>
+                    <tr>
+                        <td colspan="2" id="purpose_r">00</td>
+                        <td id="location_r">00</td>
+                        <td id="loc_sg_r">00</td>
+                    </tr>
+                </table>
+                <div>
+                    <label for="reason"><strong>거부사유</strong></label>
+                </div>
+                <textarea id="reason" class="textarea"></textarea>
+
+            </div>
+            <div style="text-align: right; margin-top: 7px">
+                <button onclick="closeModal2()" type="button" class="btn btn-light">이전</button>
+                <button type="button" id="reject_btn" class="btn btn-danger">거절</button>
+            </div>
+        </div>
+        <div id="overlay"></div>
+        <div class="loader"></div>
+    </main>
+{% endblock %}
+
+{% block script %}
+<script>
+let openModal1 = (button) => {
+
+    let row = button.parentNode.parentNode;
+
+    document.getElementById("number").innerText = row.cells[0].innerText;
+    document.getElementById("accept_name").innerText = row.cells[5].innerText;
+    document.getElementById("company").innerText = row.cells[2].innerText;
+    document.getElementById("visit_depart").innerText = row.cells[3].innerText;
+    document.getElementById("visit_posit").innerText = row.cells[4].innerText;
+    document.getElementById("visit_name").innerText = row.cells[5].innerText;
+    let data1 = row.cells[7].innerText;
+    let parts = data1.split(' ');
+    let depart = parts[0];
+    let position = parts[1];
+    let name = parts[2].slice(0, -3);
+    let sg = parts[2].slice(-2, -1);
+    document.getElementById("emp_depart").innerText = depart;
+    document.getElementById("emp_posit").innerText = position;
+    document.getElementById("emp_name").innerText = name;
+    document.getElementById("emp_sg").innerText = sg;
+
+    document.getElementById("purpose").innerText = row.cells[8].innerText;
+    let data2 = row.cells[9].innerText;
+    let loc = data2.slice(0, -3);
+    let loc_sg = data2.slice(-2, -1);
+    document.getElementById("location").innerText = loc;
+    document.getElementById("loc_sg").innerText = loc_sg;
+
+    document.getElementById("acceptModal").style.display = "block";
+    document.getElementById("overlay").style.display = "block";
+}
+
+let openModal2 = (button) => {
+    let row = button.parentNode.parentNode;
+
+    document.getElementById("number_r").innerText = row.cells[0].innerText;
+    document.getElementById("reject_name").innerText = row.cells[5].innerText;
+    document.getElementById("company_r").innerText = row.cells[2].innerText;
+    document.getElementById("visit_depart_r").innerText = row.cells[3].innerText;
+    document.getElementById("visit_posit_r").innerText = row.cells[4].innerText;
+    document.getElementById("visit_name_r").innerText = row.cells[5].innerText;
+
+    document.getElementById("purpose_r").innerText = row.cells[8].innerText;
+    let data2 = row.cells[9].innerText;
+    let loc = data2.slice(0, -3);
+    let loc_sg = data2.slice(-2, -1);
+    document.getElementById("location_r").innerText = loc;
+    document.getElementById("loc_sg_r").innerText = loc_sg;
+
+    document.getElementById("rejectModal").style.display = "block";
+    document.getElementById("overlay").style.display = "block";
+}
+
+let closeModal1 = () => {
+    document.getElementById("acceptModal").style.display = "none";
+    document.getElementById("overlay").style.display = "none";
+}
+
+let closeModal2 = () => {
+    document.getElementById("rejectModal").style.display = "none";
+    document.getElementById("overlay").style.display = "none";
+}
+</script>
+
+<script>
+let accept_btn = document.querySelector('#accept_btn');
+
+accept_btn.addEventListener('click', () => {
+    document.querySelector(".loader").style.display = "block";
+    let jsondata = {};
+    jsondata['number'] = document.getElementById("number").innerText;
+
+    fetch('http://127.0.0.1:8000/admin/accept', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(jsondata),
+        redirect: 'follow'
+    })
+        .then((res) => {
+        if (res.redirected) location.href = res.url
+    })
+        .catch((err) => console.log(err));
+});
+</script>
+<script>
+let reject_btn = document.querySelector('#reject_btn');
+
+reject_btn.addEventListener('click', () => {
+    document.querySelector(".loader").style.display = "block";
+    let jsondata = {};
+    jsondata['number'] = document.getElementById("number_r").innerText;
+    jsondata['reason'] = document.getElementById("reason").value;
+
+    fetch('http://127.0.0.1:8000/admin/reject', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(jsondata),
+        redirect: 'follow'
+    })
+        .then((res) => {
+            if (res.redirected) location.href = res.url
+        })
+        .catch((err) => console.log(err));
+
+})
+</script>
+{% endblock %}

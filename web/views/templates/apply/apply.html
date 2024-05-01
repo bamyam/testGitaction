@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+{% block style %}
+
+<style>
+    .info_box {
+        padding-top: 1px;
+        margin:  0 auto;
+        width: 900px;
+    }
+    .info_minibox1, .info_minibox2 {
+        float: left;
+        #border: 1px solid red;
+        width: 450px;
+        height: 400px;
+        font-weight: bold;
+        padding: 10px;
+        margin-top: 30px;
+        background-color: white;
+        box-shadow: 0 1px 1px 0 black;
+    }
+    .clearfix {
+        content: "";
+        display: block;
+        clear: both;
+    }
+    .btn_box {
+        text-align: center;
+        padding-top: 10px;
+    }
+    .applybtn, .rwbtn, .cancelbtn {
+        display: inline-block;
+        margin-right: 10px;
+    }
+    .date_all {
+        font-size: 14px;
+        margin-top: 5px;
+        text-align: center;
+    }
+    .visit_date {
+        display: inline-block;
+        padding-top: 20px;
+        font-size: 16px;
+    }
+</style>
+
+
+
+{% endblock %}
+{% block main %}
+    <main>
+        <form name="applyfrm">
+            <div class="main_box">
+                <div class="info_box">
+                    <div class="info_minibox1">
+                        <div id="name">
+                            <div class="col-auto">
+                                <label for="name" class="col-form-label">이름</label>
+                            </div>
+                            <div class="col-auto">
+                                <input type="text" id="name" name="name" class="form-control">
+                            </div>
+                        </div>
+                        <div id="phone_number">
+                            <div class="col-auto">
+                                <label for="phone_number" class="col-form-label">전화번호</label>
+                            </div>
+                            <div class="col-auto">
+                                <input type="text" id="phone_number" name="phone_number" class="form-control" placeholder="- 없이 숫자만 입력">
+                            </div>
+                        </div>
+                        <div id="email">
+                            <div class="col-auto">
+                                <label for="email" class="col-form-label">이메일</label>
+                            </div>
+                            <div class="email">
+                                <input type="text" id="email" name="email" class="form-control">
+                            </div>
+                        </div>
+                        <div id="company_name">
+                            <div class="col-auto">
+                                <label for="company_name" class="col-form-label">회사이름</label>
+                            </div>
+                            <div class="col-auto">
+                                <input type="text" id="company_name" name="company_name" class="form-control">
+                            </div>
+                        </div>
+                        <div id="job_position">
+                            <div class="col-auto">
+                                <label for="job_position" class="col-form-label">직급</label>
+                                <select class="form-select" name="job_position" aria-label="Default select example">
+                                    <option selected disabled>직급 선택</option>
+                                    <option value="사원">사원</option>
+                                    <option value="대리">대리</option>
+                                    <option value="과장">과장</option>
+                                    <option value="차장">차장</option>
+                                    <option value="부장">부장</option>
+                                    <option value="이사">이사</option>
+                                    <option value="전무">전무</option>
+                                    <option value="사장">사장</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info_minibox2">
+                        <div id="location">
+                            <div class="col-auto">
+                                <label for="location" class="col-form-label">방문장소</label>
+                                <select class="form-select" name="location_id" aria-label="Default select example">
+                                    {% for location in location_list %}
+                                        <option value="{{ location.id }}">{{location.location}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div id="department_name">
+                            <div class="col-auto">
+                                <label for="department_name" class="col-form-label">부서명</label>
+                            </div>
+                            <div class="col-auto">
+                                <input type="text" id="department_name" name="department_name" class="form-control">
+                            </div>
+                        </div>
+                        <div id="employee_id">
+                            <div class="col-auto">
+                                <label for="employee_id" class="col-form-label">담당자</label>
+                                <select class="form-select" name="employee_id">
+                                    {% for emp in emp_list %}
+                                        <option value="{{ emp.id }}">{{emp.name}} {{emp.job_position}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div id="purpose">
+                            <div class="col-auto">
+                                <label for="purpose" class="col-form-label">방문목적</label>
+                            </div>
+                            <div class="purpose">
+                                <input type="text" id="purpose" name="purpose" class="form-control">
+                            </div>
+                        </div>
+                        <div class="date_all">
+                            <div class="visit_date">
+                                <div class="col-auto">
+                                    <label for="visit_date" class="col-form-label">방문일자</label>
+                                    <input type="date" id="visit_date" name="visit_date">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+                <div class="btn_box">
+                    <div class="applybtn">
+                        <button type="button" name="applybtn" id="applybtn" class="form-control btn btn-light btn-outline-dark btn-lg theme-btn--dark-inverse sqs-button-element--dark">방문신청</button>
+
+                    </div>
+                    <div class="rwbtn">
+                        <button type="button" name="rwbtn" class="form-control btn btn-light btn-outline-dark btn-lg theme-btn--dark-inverse sqs-button-element--dark" onClick="location.href='/apply'">&nbsp;재작성&nbsp;</button>
+                    </div>
+                    <div class="cancelbtn">
+                        <button type="button" name="cancelbtn" class="form-control btn btn-light btn-outline-dark btn-lg theme-btn--dark-inverse sqs-button-element--dark" onClick="location.href='/'">방문취소</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </main>
+{% endblock %}
+{% block script %}
+    <script>
+        document.querySelector('#applybtn').addEventListener('click', submitFormData);
+
+        function validateForm() {
+            let applyfrm = document.applyfrm;
+            let name = applyfrm.name.value;
+            let phone_number = applyfrm.phone_number.value;
+            let email = applyfrm.email.value;
+            let company_name = applyfrm.company_name.value;
+            let job_position_select = applyfrm.job_position;
+            let job_position = job_position_select.options[job_position_select.selectedIndex].value;
+            let location_select = applyfrm.location_id;
+            let location = location_select.options[location_select.selectedIndex].value;
+            let department_name = applyfrm.department_name.value;
+            let purpose = applyfrm.purpose.value;
+            let visit_date = applyfrm.visit_date.value;
+
+            // 필수 필드 확인
+            if (!name || !phone_number || !email || !company_name || job_position_select.selectedIndex === -1 || location_select.selectedIndex === -1 || !department_name || !purpose || !visit_date) {
+                alert('모든 필수 항목을 입력해주세요.');
+                return false;
+            }
+
+            // 전화번호 유효성 검사
+            let phoneRegex = /^\d{10,11}$/;
+            if (!phoneRegex.test(phone_number)) {
+                alert('올바른 핸드폰 번호를 입력해주세요.');
+                applyfrm.phone_number.focus();
+                return false;
+            }
+
+            return true;
+        }
+
+        function submitFormData() {
+            if (!validateForm()) {
+                return; // 유효성 검사에 실패하면 제출을 중단합니다.
+            }
+            let applyfrm = document.applyfrm;
+            let formData = new FormData(applyfrm);
+            let jsonData = {};
+
+            formData.forEach(function(val, key) {
+                jsonData[key] = val;
+            });
+
+            let apiUrl = `http://127.0.0.1:8000/apply/applyok`;
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(jsonData)
+            })
+                .then(response => {
+                    return response.json();
+                })
+                .then(data => {
+                    if (data === 1) { // 서버 응답 값이 1일 경우에만 페이지 리다이렉션 실행
+                        alert('방문 신청이 성공적으로 접수되었습니다.');
+                        window.location.href = '/apply/applyok'; // 성공적으로 데이터가 처리된 후 원하는 페이지로 이동
+                    } else {
+                        // 데이터 값이 1이 아닐 경우, 다른 처리를 수행할 수 있습니다.
+                        alert('방문 신청 처리에 문제가 발생했습니다. 다시 시도해주세요.');
+                    }
+                })
+        }
+
+        // 오늘 날짜를 가져오는 함수
+        function getTodayDateTime() {
+            var today = new Date();
+            var yyyy = today.getFullYear();
+            var mm = String(today.getMonth() + 1).padStart(2, '0');
+            var dd = String(today.getDate()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd}`;
+        }
+
+        // input 요소에 오늘 날짜 설정
+        document.getElementById('visit_date').value = getTodayDateTime();
+    </script>
+
+{% endblock %}

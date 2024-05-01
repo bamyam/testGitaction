@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block style %}
+<style>
+    .main_text {
+        #border: 1px solid red;
+        font-size: 32px;
+        text-align: center;
+        font-weight: bold;
+        padding-top: 100px;
+        text-shadow: 3px 3px 3px gray;
+    }
+    .btn_box {
+        #border: 1px solid red;
+        text-align: center;
+        padding-top: 50px;
+    }
+    .btn1 {
+        display: inline-block;
+        margin-right: 10px;
+    }
+    .btn2 {
+        display: inline-block;
+        margin-left: 10px;
+    }
+</style>
+
+{% endblock %}
+{% block main %}
+<main>
+    <div class="main_box">
+        <div class="main_text">
+            <p>행복한 하루를 함께하는 SJCOMPANY 방문신청 서비스 입니다.</p>
+            <p>원하시는 서비스를 선택하여 주십시오.</p>
+        </div>
+        <div class="btn_box">
+            <div class="btn1">
+                <button type="button" class="form-control btn btn-light btn-outline-dark btn-lg theme-btn--dark-inverse sqs-button-element--dark" onClick="location.href='/apply'">방문신청하기</button>
+            </div>
+            <div class="btn2">
+                <button type="button" class="form-control btn btn-light btn-outline-dark btn-lg theme-btn--dark-inverse sqs-button-element--dark" onClick="location.href='/check'">방문조회하기</button>
+            </div>
+        </div>
+    </div>
+</main>
+
+{% endblock %}

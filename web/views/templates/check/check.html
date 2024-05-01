@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% block style %}
+<style>
+    .info_box {
+        padding-top: 1px;
+        margin:  0 auto;
+        width: 900px;
+    }
+    .info_mini_box1 {
+        font-size: 32px;
+        text-align: center;
+        font-weight: bold;
+        padding-top: 30px;
+        text-shadow: 3px 3px 3px gray;
+    }
+    .info_mini_box2_back {
+        background-color: white;
+        width: 900px;
+        box-shadow: 0 1px 1px 0 black;
+    }
+    .info_mini_box2 {
+        margin: 0 auto;
+        padding-top: 40px;
+        width: 500px;
+        height: 350px;
+        font-weight: bold;
+    }
+    .btn_box {
+        text-align: center;
+        padding-top: 20px;
+    }
+    .btn1, .btn2 {
+        display: inline-block;
+        margin-right: 10px;
+    }
+</style>
+{% endblock %}
+{% block main %}
+    <main>
+        <form name="checkfrm" method="post">
+            <div class="main_box">
+                <div class="info_box">
+                    <div class="info_mini_box1">
+                        <p>방문 조회입니다. 필요한 정보확인 후 조회를 눌러주십시오.</p>
+                    </div>
+                    <div class="info_mini_box2_back">
+                        <div class="info_mini_box2">
+                            <div class="name">
+                                <div class="col-auto">
+                                    <label for="name" class="col-form-label">이름</label>
+                                </div>
+                                <div class="col-auto">
+                                    <input type="text" id="name" name="name" class="form-control">
+                                </div>
+                                <div class="col-auto">
+                                </div>
+                            </div>
+                            <div class="phone_number">
+                                <div class="col-auto">
+                                    <label for="phone_number" class="col-form-label">전화번호</label>
+                                </div>
+                                <div class="phone_number">
+                                    <input type="text" id="phone_number" name="phone_number" class="form-control" placeholder="- 없이 숫자만 입력">
+                                </div>
+                                <div class="col-auto">
+                                </div>
+                            </div>
+                            <div class="btn_box">
+                                <div class="btn1">
+                                    <button type="button" id="btn1" name="btn1" class="form-control btn btn-light btn-outline-dark btn-lg theme-btn--dark-inverse sqs-button-element--dark">조회하기</button>
+                                </div>
+                                <div class="btn2">
+                                    <button type="button" class="form-control btn btn-light btn-outline-dark btn-lg theme-btn--dark-inverse sqs-button-element--dark" onClick="location.href='/'">&nbsp;홈으로&nbsp;</button>
+                                </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </form>
+    </main>
+{% endblock %}
+{% block script %}
+    <script>
+        let btn1 = document.querySelector('#btn1');
+        let checkfrm = document.checkfrm;
+        btn1.addEventListener('click', () => {
+            const formData = new FormData(checkfrm);
+            let jsondata = {};
+            let hasData = false;
+
+            formData.forEach(function (val, key) {
+                jsondata[key] = val;
+                if (val.trim() !== '') { // Check if the value is not empty or contains only whitespaces
+                    hasData = true;
+                }
+            });
+
+            if (!hasData) {
+                alert('정보를 입력해주세요!');
+            } else {
+                console.log(jsondata);
+                checkfrm.action = '/check/checkok';
+                checkfrm.submit();
+            }
+        });
+    </script>
+
+
+{% endblock %}
+
+
